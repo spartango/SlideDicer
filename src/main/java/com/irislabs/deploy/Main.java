@@ -2,7 +2,7 @@ package com.irislabs.deploy;
 
 import com.irislabs.dice.Tiler;
 import com.irislabs.fetch.Fetcher;
-import com.irislabs.fetch.FetcherListener;
+import com.irislabs.parallel.FullServiceTiler;
 import com.irislabs.slide.OpenSlideImage;
 import com.irislabs.write.Writer;
 
@@ -10,8 +10,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Author: spartango
@@ -29,28 +30,12 @@ public class Main {
             return;
         }
 
-
-        Fetcher fetcher = new Fetcher();
-        // Parallel, pipelined work
-        fetcher.fetch(Arrays.asList(args), new FetcherListener() {
-            @Override public void onFetched(String source, OpenSlideImage image) {
-                System.out.println("Tiling " + image);
-                Tiler tiler = new Tiler(256, 256, 1.0);
-                Writer writer = new Writer("/tmp/tiles", "png");
-                tiler.tile(image, writer);
-            }
-
-            @Override public void onFetchingComplete(Collection<String> targets) {
-                System.out.println("Finished fetching all " + targets.size() + " tiles");
-            }
-        });
-        System.out.println("Wrote out all tiles");
-
+        long linearStart = System.currentTimeMillis();
         // Linear work
         Fetcher linearFetcher = new Fetcher();
         Tiler linearTiler = new Tiler(256, 256, 1.0);
         Writer linearWriter = new Writer("/tmp/tiles", "png");
-        final Map<String, OpenSlideImage> fetched = fetcher.fetch(Arrays.asList(args));
+        final Map<String, OpenSlideImage> fetched = linearFetcher.fetch(Arrays.asList(args));
         for (OpenSlideImage slide : fetched.values()) {
             final Map<Point, BufferedImage> tiles = linearTiler.tile(slide);
             for (Map.Entry<Point, BufferedImage> tileEntry : tiles.entrySet()) {
@@ -60,6 +45,20 @@ public class Main {
                 linearWriter.write(slide.getFile().getName(), tile, point.x, point.y);
             }
         }
+        long linearEnd = System.currentTimeMillis();
+        System.out.println("Linear runtime: " + (linearEnd - linearStart) + " ms");
 
+        long parallelStart = System.currentTimeMillis();
+        // Parallel work
+        FullServiceTiler superTiler = new FullServiceTiler("/tmp/tiles");
+        final Future<Void> result = superTiler.tile(Arrays.asList(args));
+        try {
+            result.get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        long parallelEnd = System.currentTimeMillis();
+
+        System.out.println("Parallel runtime: " + (parallelEnd - parallelStart) + " ms");
     }
 }

@@ -11,10 +11,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Author: spartango
@@ -24,8 +20,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Fetcher {
 
     private String downloadPath = "/tmp/";
-
-    private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public OpenSlideImage fetch(String target) throws IOException {
         if (target.startsWith("http://") || target.startsWith("https://")) {
@@ -66,29 +60,5 @@ public class Fetcher {
         }
         return map;
     }
-
-    public void fetch(final Collection<String> targets, final FetcherListener listener) {
-        final AtomicInteger remaining = new AtomicInteger(targets.size());
-        for (final String target : targets) {
-            executor.submit(new Callable<OpenSlideImage>() {
-                @Override public OpenSlideImage call() throws Exception {
-                    OpenSlideImage slide = null;
-                    try {
-                        slide = fetch(target);
-                        listener.onFetched(target, slide);
-                    } catch (IOException e) {
-                        System.err.println("Failed to fetch " + target + " because " + e);
-                    }
-
-                    if (remaining.decrementAndGet() == 0) {
-                        listener.onFetchingComplete(targets);
-                    }
-
-                    return slide;
-                }
-            });
-        }
-    }
-
 
 }

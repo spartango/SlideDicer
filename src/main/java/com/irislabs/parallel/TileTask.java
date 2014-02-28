@@ -22,6 +22,7 @@ public class TileTask extends RecursiveAction {
 
     private Writer writer;
 
+
     public TileTask(OpenSlideImage slide, int x, int y, int tileWidth, int tileHeight, double zoom, String outputDir) {
         this.slide = slide;
         this.x = x;
@@ -30,7 +31,7 @@ public class TileTask extends RecursiveAction {
         this.tileHeight = tileHeight;
         this.zoom = zoom;
 
-        writer = new Writer(outputDir, "png");
+        writer = new Writer(outputDir);
     }
 
     @Override protected void compute() {
@@ -45,4 +46,5 @@ public class TileTask extends RecursiveAction {
             System.err.println("Error reading tile " + x + ", " + y + ": " + e);
         }
     }
+
 }

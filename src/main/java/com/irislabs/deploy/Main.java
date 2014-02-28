@@ -1,6 +1,8 @@
 package com.irislabs.deploy;
 
+import com.irislabs.fetch.Fetcher;
 import com.irislabs.parallel.FullServiceTiler;
+import com.irislabs.write.Writer;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,9 +22,12 @@ public class Main {
             return;
         }
 
+        Fetcher.setDownloadPath(".");
+        Writer.setFileType("jpeg");
+
         long parallelStart = System.currentTimeMillis();
         // Parallel work
-        FullServiceTiler superTiler = new FullServiceTiler(256, 256, 1.0, "/tmp/tiles");
+        FullServiceTiler superTiler = new FullServiceTiler(256, 256, 1.0, ".");
         final Future<Void> result = superTiler.tile(Arrays.asList(args));
         try {
             result.get();

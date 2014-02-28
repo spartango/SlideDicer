@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,7 @@ import java.util.Map;
  * Time: 2:05 PM.
  */
 public class Fetcher {
-
-    private String downloadPath = "/tmp/";
+    private static String downloadPath = "/tmp/";
 
     public OpenSlideImage fetch(String target) throws IOException {
         if (target.startsWith("http://") || target.startsWith("https://")) {
@@ -61,4 +61,15 @@ public class Fetcher {
         return map;
     }
 
+    public static void setDownloadPath(String downloadPath) {
+        File dir = new File(downloadPath);
+        if (!dir.exists()) {
+            try {
+                Files.createDirectory(dir.toPath());
+            } catch (IOException e) {
+                System.err.println("Failed to create " + dir + " for slides because of " + e);
+            }
+        }
+        Fetcher.downloadPath = downloadPath;
+    }
 }

@@ -17,9 +17,9 @@ public class Writer {
     }
 
     private final String path;
-    private final String fileType;
+    private static String fileType;
 
-    public Writer(String path, String fileType) {
+    public Writer(String path) {
         this.path = path;
         File dir = new File(path);
         if (!dir.exists()) {
@@ -30,7 +30,6 @@ public class Writer {
             }
         }
 
-        this.fileType = fileType;
     }
 
     public void write(final String id, final BufferedImage tile, final int x, final int y) throws
@@ -42,4 +41,7 @@ public class Writer {
         return path + File.separator + id + "_" + x + "_" + y + "." + fileType;
     }
 
+    public static void setFileType(String fileType) {
+        Writer.fileType = fileType;
+    }
 }

@@ -16,6 +16,10 @@ import java.util.concurrent.Future;
  */
 public class Main {
 
+    private static final int    WIDTH  = 256;
+    private static final int    HEIGHT = 256;
+    private static final double ZOOM   = 1.0;
+
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length == 0) {
             System.out.println("Usage: dicer [image locations]");
@@ -27,7 +31,7 @@ public class Main {
 
         long parallelStart = System.currentTimeMillis();
         // Parallel work
-        FullServiceTiler superTiler = new FullServiceTiler(256, 256, 1.0, ".");
+        FullServiceTiler superTiler = new FullServiceTiler(WIDTH, HEIGHT, ZOOM, ".");
         final Future<Void> result = superTiler.tile(Arrays.asList(args));
         try {
             result.get();

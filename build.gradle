@@ -33,6 +33,6 @@ dependencies {
 }
 
 // Location of main (for running)
-mainClassName = ""
+mainClassName = "com.irislabs.deploy.Main"
 
 defaultTasks 'build'

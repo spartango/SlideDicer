@@ -14,7 +14,7 @@ import java.util.concurrent.RecursiveAction;
  */
 public class FullServiceTiler {
 
-    private final ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+    private final ForkJoinPool pool = new ForkJoinPool(2 * Runtime.getRuntime().availableProcessors());
 
     private String outputDir;
     private int tileWidth;

@@ -26,12 +26,12 @@ public class Main {
             return;
         }
 
-        Fetcher.setDownloadPath("");
+        Fetcher.setDownloadPath("/tmp/slides");
         Writer.setFileType("jpeg");
 
         long parallelStart = System.currentTimeMillis();
         // Parallel work
-        FullServiceTiler superTiler = new FullServiceTiler(WIDTH, HEIGHT, ZOOM, "");
+        FullServiceTiler superTiler = new FullServiceTiler(WIDTH, HEIGHT, ZOOM, "/tmp/tiles");
         final Future<Void> result = superTiler.tile(Arrays.asList(args));
         try {
             result.get();

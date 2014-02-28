@@ -14,16 +14,22 @@ import java.util.concurrent.RecursiveAction;
  */
 public class FullServiceTiler {
 
-    private final ForkJoinPool pool = new ForkJoinPool();
+    private final ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
 
     private String outputDir;
+    private int tileWidth;
+    private int tileHeight;
+    private double zoom;
 
-    public FullServiceTiler(String outputDir) {
+    public FullServiceTiler(int tileWidth, int tileHeight, double zoom, String outputDir) {
         this.outputDir = outputDir;
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
+        this.zoom = zoom;
     }
 
     public Future<Void> tile(final String target) {
-        return pool.submit(new FetchTask(target, outputDir));
+        return pool.submit(new FetchTask(target, tileWidth, tileHeight, zoom, outputDir));
     }
 
     public Future<Void> tile(final Collection<String> targets) {
@@ -31,7 +37,7 @@ public class FullServiceTiler {
             @Override protected void compute() {
                 List<FetchTask> tasks = new LinkedList<>();
                 for (String target : targets) {
-                    tasks.add(new FetchTask(target, outputDir));
+                    tasks.add(new FetchTask(target, tileWidth, tileHeight, zoom, outputDir));
                 }
                 invokeAll(tasks);
             }

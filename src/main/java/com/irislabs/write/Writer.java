@@ -25,7 +25,7 @@ public class Writer implements TilerListener {
     private final String path;
     private final String fileType;
 
-    private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private static ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public Writer(String path, String fileType) {
         this.path = path;
@@ -41,20 +41,25 @@ public class Writer implements TilerListener {
         this.fileType = fileType;
     }
 
+    public void write(final String id, final BufferedImage tile, final int x, final int y) throws
+                                                                                           IOException {
+        ImageIO.write(tile, fileType, new File(filenameFor(id, x, y)));
+    }
+
     @Override public void onNewTile(final OpenSlideImage source, final BufferedImage tile, final int x, final int y) {
         executor.submit(new Callable<Void>() {
             @Override public Void call() throws Exception {
-                ImageIO.write(tile, fileType, new File(filenameFor(source, x, y)));
+                write(source.getFile().getName(), tile, x, y);
                 return null;
             }
         });
     }
 
-    private String filenameFor(OpenSlideImage source, int x, int y) {
-        return path + File.separator + source.getFile().getName() + "_" + x + "_" + y + "." + fileType;
+    private String filenameFor(String id, int x, int y) {
+        return path + File.separator + id + "_" + x + "_" + y + "." + fileType;
     }
 
     @Override public void onTilingComplete(OpenSlideImage target, int tiles) {
-        // Ignore
+        System.out.println("End of tiling " + target + " -> " + tiles + " tiles");
     }
 }

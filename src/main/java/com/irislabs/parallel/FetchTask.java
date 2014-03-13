@@ -15,13 +15,13 @@ import java.util.concurrent.RecursiveAction;
  */
 public class FetchTask extends RecursiveAction {
 
-    private String target;
-    private int    tileHeight;
-    private int    tileWidth;
-    private double zoom;
-    private String outputDir;
+    protected String target;
+    protected int    tileHeight;
+    protected int    tileWidth;
+    protected double zoom;
+    protected String outputDir;
 
-    private Fetcher fetcher;
+    protected Fetcher fetcher;
 
     public FetchTask(String target, int tileHeight, int tileWidth, double zoom, String outputDir) {
         this.target = target;
@@ -37,15 +37,20 @@ public class FetchTask extends RecursiveAction {
         try {
             System.out.println("Fetching "+target);
             final OpenSlideImage slide = fetcher.fetch(target);
-            List<TileTask> tilingTasks = new LinkedList<>();
-            for (int y = 0; y < slide.getHeight(); y += tileHeight) {
-                for (int x = 0; x < slide.getWidth(); x += tileWidth) {
-                    tilingTasks.add(new TileTask(slide, x, y, tileWidth, tileHeight, zoom, outputDir));
-                }
-            }
-            invokeAll(tilingTasks);
+            tile(slide);
         } catch (IOException e) {
             System.err.println("Failed to fetch " + target + " because of " + e);
         }
     }
+
+    protected void tile(OpenSlideImage slide) {
+        List<TileTask> tilingTasks = new LinkedList<>();
+        for (int y = 0; y < slide.getHeight(); y += tileHeight) {
+            for (int x = 0; x < slide.getWidth(); x += tileWidth) {
+                tilingTasks.add(new TileTask(slide, x, y, tileWidth, tileHeight, zoom, outputDir));
+            }
+        }
+        invokeAll(tilingTasks);
+    }
+
 }

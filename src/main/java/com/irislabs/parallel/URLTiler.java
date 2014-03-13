@@ -12,16 +12,16 @@ import java.util.concurrent.RecursiveAction;
  * Date: 2/28/14
  * Time: 3:38 PM.
  */
-public class FullServiceTiler {
+public class URLTiler {
 
-    private final ForkJoinPool pool = new ForkJoinPool(2 * Runtime.getRuntime().availableProcessors());
+    protected final ForkJoinPool pool = new ForkJoinPool(2 * Runtime.getRuntime().availableProcessors());
 
-    private String outputDir;
-    private int tileWidth;
-    private int tileHeight;
-    private double zoom;
+    protected String outputDir;
+    protected int    tileWidth;
+    protected int    tileHeight;
+    protected double zoom;
 
-    public FullServiceTiler(int tileWidth, int tileHeight, double zoom, String outputDir) {
+    public URLTiler(int tileWidth, int tileHeight, double zoom, String outputDir) {
         this.outputDir = outputDir;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;

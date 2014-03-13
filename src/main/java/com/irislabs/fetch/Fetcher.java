@@ -1,5 +1,7 @@
 package com.irislabs.fetch;
 
+import com.irislabs.clinical.Patient;
+import com.irislabs.clinical.image.SlideIndex;
 import com.irislabs.slide.OpenSlideImage;
 
 import java.io.File;
@@ -41,6 +43,8 @@ public class Fetcher {
             try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                  FileOutputStream fos = new FileOutputStream(target);) {
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                fos.flush();
+                fos.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -61,6 +65,18 @@ public class Fetcher {
         return map;
     }
 
+    public void updateSlides(Patient patient, SlideIndex index) {
+        final Map<String, OpenSlideImage> slides = getSlides(patient, index);
+        for (Map.Entry<String, OpenSlideImage> slideEntry : slides.entrySet()) {
+            patient.addSlide(slideEntry.getKey(), slideEntry.getValue());
+        }
+    }
+
+    public Map<String, OpenSlideImage> getSlides(Patient patient, SlideIndex index) {
+        Collection<String> slideUrls = index.getSlideUrls(patient);
+        return fetch(slideUrls);
+    }
+
     public static void setDownloadPath(String downloadPath) {
         File dir = new File(downloadPath);
         if (!dir.exists()) {
@@ -72,4 +88,6 @@ public class Fetcher {
         }
         Fetcher.downloadPath = downloadPath;
     }
+
+
 }

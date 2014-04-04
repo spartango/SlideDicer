@@ -29,14 +29,12 @@ public class Main {
     private static final String CLINICAL_URL =
             "https://tcga-data.nci.nih.gov/tcgafiles/ftp_auth/distro_ftpusers/anonymous/tumor/"
             + CANCER
-            + "/bcr/nationwidechildrens.org/biotab/clin/nationwidechildrens.org_clinical_patient_"
+            + "/bcr/biotab/clin/nationwidechildrens.org_clinical_patient_"
             + CANCER
             + ".txt";
 
     private static final String SLIDE_URL =
-            "https://tcga-data.nci.nih.gov/tcgafiles/ftp_auth/distro_ftpusers/anonymous/tumor/"
-            + CANCER
-            + "/bcr/";
+            "https://tcga-data.nci.nih.gov/tcgafiles/ftp_auth/distro_ftpusers/anonymous/tumor/" + CANCER + "/bcr/";
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Fetcher.setDownloadPath("/tmp/slides/");
